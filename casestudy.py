@@ -6,8 +6,8 @@ import heapq
 from functions import *
 
 
-driversdata=pd.read_csv('drivers.csv')
-passengersdata=pd.read_csv('passengers.csv')
+driversdata=pd.read_csv('drivers.csv', nrows=5)
+passengersdata=pd.read_csv('passengers.csv', nrows=5)
 
 def createpassengerstuple(passengersdata):
     listpassengers=[]
@@ -47,10 +47,16 @@ def findelapsedtime(requesttime):
 driverstuples=createdriverstuple(driversdata)
 passengerstuples=createpassengerstuple(passengersdata)
 
-#print(driverstuples)
-#print(passengerstuples)
+# print(driverstuples)
+print(passengerstuples)
 
+#create minheap
 
+heapq.heapify(driverstuples)
+heapq._heapify_max(passengerstuples)
+
+# print(heapq.heappop(driverstuples))
+print(heapq.heappop(passengerstuples))
 
 
 
