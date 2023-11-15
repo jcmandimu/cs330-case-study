@@ -3,7 +3,6 @@ import pandas as pd
 import json as js
 import time
 import heapq
-from functions import *
 
 
 driversdata=pd.read_csv('drivers.csv')
@@ -49,8 +48,3 @@ passengerstuples=createpassengerstuple(passengersdata)
 
 #print(driverstuples)
 #print(passengerstuples)
-
-
-
-
-
