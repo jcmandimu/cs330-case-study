@@ -2,6 +2,18 @@ from datetime import datetime
 import pandas as pd
 
 driversdata=pd.read_csv('drivers.csv')
+passengersdata=pd.read_csv('passengers.csv')
+
+def createpassengerstuple(passengersdata):
+    listpassengers=[]
+    datetimes=passengersdata["Date/Time"]
+
+    for i in range(len(datetimes)):
+        wait=abs(findelapsedtime(datetimes[i]))
+        tuplepassenger=(wait,(passengersdata["Date/Time"][i],passengersdata["Source Lat"][i],passengersdata["Source Lon"][i],passengersdata["Dest Lat"][i],passengersdata["Dest Lon"][i]))
+        listpassengers.append(tuplepassenger)
+    
+    return listpassengers
 
 
 def createdriverstuple(driversdata):
@@ -9,7 +21,7 @@ def createdriverstuple(driversdata):
     datetimes=driversdata["Date/Time"]
 
     for i in range(len(datetimes)):
-        wait=findelapsedtime(datetimes[i])
+        wait=abs(findelapsedtime(datetimes[i]))
         tupledriver=(wait,(driversdata["Date/Time"][i],driversdata["Source Lat"][i],driversdata["Source Lon"][i]))
         listdrivers.append(tupledriver)
     
@@ -26,9 +38,11 @@ def findelapsedtime(requesttime):
 
 
 
-print(driversdata["Date/Time"][0])
-print(findelapsedtime(driversdata['Date/Time'][0]))
-print(createdriverstuple(driversdata))
+driverstuples=createdriverstuple(driversdata)
+passengerstuples=createpassengerstuple(passengersdata)
+
+#print(driverstuples)
+#print(passengerstuples)
 
 
 
