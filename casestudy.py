@@ -13,6 +13,9 @@ passengersdata=pd.read_csv('passengers.csv')
 
 
 def t1(driversdata,passengersdata):
+    global driverstuples
+    global passengerstuples
+
     driverstuples=createdriverstuple(driversdata)
     passengerstuples=createpassengerstuple(passengersdata)
 
@@ -41,12 +44,18 @@ def t1(driversdata,passengersdata):
     return match
     
 
-t1(driversdata,passengersdata)
+# t1(driversdata,passengersdata)
  
 
 def t2():
+    # dictionary with driver-passanger pairs as keys and distances as values
     dpDistances = dict()
+    initial_matches = t1(driversdata,passengersdata)
+
     calculatingdpDistances(dpDistances)
-    print(dpDistances.values())
+    
+    
+
+    # print(dpDistances.values())
 
 t2()
