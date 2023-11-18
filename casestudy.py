@@ -7,8 +7,8 @@ from functions import *
 import queue
 
 
-driversdata=pd.read_csv('drivers.csv',nrows=5)
-passengersdata=pd.read_csv('passengers.csv',nrows=5)
+driversdata=pd.read_csv('drivers.csv')
+passengersdata=pd.read_csv('passengers.csv')
 
 
 def t1(driversdata,passengersdata):
@@ -23,9 +23,9 @@ def t1(driversdata,passengersdata):
     for d in driverstuples:
         #put each driver in the queue
         dq.put(d)
-    
+        
     #Create match
-    for passenger in passengersdata:
+    for passenger in passengerstuples:
          #pop out the firt elem aka first driver
         driver_to_match=dq.get()
         #and put it back into the back of the queue
@@ -34,12 +34,11 @@ def t1(driversdata,passengersdata):
         #Find match
         next_passenger=heapq.heappop(passengerstuples)
         match=(next_passenger[1],driver_to_match[1])
-        print(next_passenger)    
-        print(driver_to_match)
+        # print(next_passenger)    
+        # print(driver_to_match)
         print(match)
     return match
     
 
 t1(driversdata,passengersdata)
-
 
