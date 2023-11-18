@@ -4,6 +4,8 @@ import json as js
 import time
 import heapq
 import math
+from collections import defaultdict
+
 
 
 driversdata=pd.read_csv('drivers.csv')
@@ -48,16 +50,15 @@ def findelapsedtime(requesttime):
 driverstuples=createdriverstuple(driversdata)
 passengerstuples=createpassengerstuple(passengersdata)
 
-#t2 functiobs
-def calculateDistance(x1,y1,x2,y2): 
+#t2 functions
+def calculateDistance(x1,x2,y1,y2): 
     return math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
 
 def calculatingdpDistances(dists):
     for driver in driverstuples:
         for passenger in passengerstuples:
-            distance = calculateDistance(driver[1][2], passenger[1][2],driver[1][1], passenger[1][1])
-            dists.update({(driver, passenger) : distance})
-
+            distance = calculateDistance(driver[1][1], passenger[1][1], driver[1][2], passenger[1][2])
+            dists[passenger].append((driver,distance))
 
 #print(driverstuples)
 #print(passengerstuples)
