@@ -9,6 +9,7 @@ import math
 driversdata=pd.read_csv('drivers.csv')
 passengersdata=pd.read_csv('passengers.csv')
 
+#t1 functions
 def createpassengerstuple(passengersdata):
     listpassengers=[]
     datetimes=passengersdata["Date/Time"]
@@ -46,6 +47,17 @@ def findelapsedtime(requesttime):
 
 driverstuples=createdriverstuple(driversdata)
 passengerstuples=createpassengerstuple(passengersdata)
+
+#t2 functiobs
+def calculateDistance(x1,y1,x2,y2): 
+    return math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
+
+def calculatingdpDistances(dists):
+    for driver in driverstuples:
+        for passenger in passengerstuples:
+            distance = calculateDistance(driver[1][2], passenger[1][2],driver[1][1], passenger[1][1])
+            dists.update({(driver, passenger) : distance})
+
 
 #print(driverstuples)
 #print(passengerstuples)

@@ -5,6 +5,7 @@ import time
 import heapq
 from functions import *
 import queue
+import math
 
 
 driversdata=pd.read_csv('drivers.csv')
@@ -36,9 +37,16 @@ def t1(driversdata,passengersdata):
         match=(next_passenger[1],driver_to_match[1])
         # print(next_passenger)    
         # print(driver_to_match)
-        print(match)
+        # print(match)
     return match
     
 
 t1(driversdata,passengersdata)
+ 
 
+def t2():
+    dpDistances = dict()
+    calculatingdpDistances(dpDistances)
+    print(dpDistances.values())
+
+t2()
