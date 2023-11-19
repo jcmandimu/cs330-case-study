@@ -35,12 +35,12 @@ def t1():
         dq.put(driver_to_match)
 
         #Find match
-        next_passenger=heapq.heappop(passengerstuples)
+        next_passenger=heapq._heappop_max(passengerstuples)
         match=(next_passenger[1],driver_to_match[1])
         # print(next_passenger)    
         # print(driver_to_match)
         print(match)
-    return match
+    return 
     
 # t1()
  
@@ -54,31 +54,36 @@ def t2():
     heapq._heapify_max(passengerstuples)
 
     #initializing FIFO queue for drivers
-    dq=queue.Queue(maxsize=len(driverstuples))
+    dq=deque()
     for d in driverstuples:
         #put each driver in the queue
-        dq.put(d)
+        dq.append(d)
     
     #Create match
     for passenger in passengerstuples:
         
-        next_passenger=heapq.heappop(passengerstuples)
+        if(not passengerstuples):
+            return
+        if(not dq):
+            return
+        
+        next_passenger=heapq._heappop_max(passengerstuples)
+    
         driver_to_match = min(dpDistances.get(next_passenger), key=lambda x: x[1])
-
-
+        driver_to_match = driver_to_match[0]
+    
         #if this is the closet match
-        if(dq.get() == driver_to_match[0]):
+        if(dq[0] == driver_to_match):
             #pop out the firt elem aka first driver
-            driver_to_match=dq.get()
+            dq.popleft()
             #and put it back into the back of the queue
-            # dq.put(driver_to_match)
+            # dq.push(driver_to_match)
         else:
-        #Find match
-            driver_to_match=min(dpDistances.get(next_passenger), key=lambda x: x[1])
-            dq.get(driver_to_match[0])
-            # dq.put(driver_to_match[0])
-            driver_to_match = driver_to_match[0]
-
+        #Find new match
+            if(driver_to_match not in dq):
+                driver_to_match = dq.popleft()
+            else:
+                dq.remove(driver_to_match)
         
         # driver_to_match 
         match=(driver_to_match, next_passenger)
@@ -86,9 +91,7 @@ def t2():
 
         # print(next_passenger)    
         # print(driver_to_match)
-        print(match)
-    return match
+        # print(match)
+    return 
     
-
-
-t2()
+# t2()
