@@ -50,15 +50,25 @@ def findelapsedtime(requesttime):
 driverstuples=createdriverstuple(driversdata)
 passengerstuples=createpassengerstuple(passengersdata)
 
-#t2 functions
+#t2 functions 
 def calculateDistance(x1,x2,y1,y2): 
     return math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1))
 
-def calculatingdpDistances(dists):
+def calculatingDistances(dists):
     for driver in driverstuples:
         for passenger in passengerstuples:
             distance = calculateDistance(driver[1][1], passenger[1][1], driver[1][2], passenger[1][2])
             dists[passenger].append((driver,distance))
 
-#print(driverstuples)
-#print(passengerstuples)
+#t3 functions
+def calculatingTravelTimes(times):
+    for driver in driverstuples:
+        for passenger in passengerstuples:
+            travelTime = calculateDistance(driver[1][1], passenger[1][1], driver[1][2], passenger[1][2])
+            times[passenger].append((driver,travelTime))
+
+def findStart():
+    return
+def findEnd():
+    return
+
