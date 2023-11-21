@@ -7,9 +7,9 @@ import math
 from collections import defaultdict
 
 
-driversdata = pd.read_csv("drivers.csv")
+driversdata = pd.read_csv("drivers.csv", nrows = 1)
 passengersdata = pd.read_csv("passengers.csv")
-edge_data = pd.read_csv("edges.csv")
+# edge_data = pd.read_csv("edges.csv")
 
 
 n = open("node_data.json")
@@ -147,7 +147,6 @@ def createdriverstuple(driversdata):
             ),
         )
         listdrivers.append(tupledriver)
-
     return listdrivers
 
 
@@ -215,12 +214,14 @@ def findEnd():
 
 
 def main():
-    # Opening JSON file
-    n = open("node_data.json")
+    # # Opening JSON file
+    # n = open("node_data.json")
 
-    # returns JSON object as a dictionary
-    node_data = js.load(n)
-    getNodeInfo(node_data)
+    # # returns JSON object as a dictionary
+    # node_data = js.load(n)
+    # getNodeInfo(node_data)
+    driversdata = pd.read_csv("drivers.csv", nrows = 1)
+    print(createdriverstuple(driversdata))
 
 
 

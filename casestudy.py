@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import deque, defaultdict
 import pandas as pd
 import json as js
@@ -184,7 +184,39 @@ def findClosestNode(driver_coords, nodes_arr):
     return ret[0]
 
 
-# time is in hours.
+def convertDecimalHours(n):
+    minutes = n * 60
+    seconds = n * 3600
+
+    return (minutes, seconds)
+
+
+def clock(curr_dt, estimated_time):
+    ms_tup = convertDecimalHours(estimated_time)
+
+    # convert float to int because timedelta only accepts int values
+    minutes = round(ms_tup[0])
+    seconds = round(ms_tup[1])
+
+    # add minutes to datetime
+    time_change = timedelta(minutes=minutes, seconds=seconds)
+    new_time = curr_dt + time_change
+    return new_time
+
+
+def getCorrectWeight(curr_dt, network, current_node, k):
+    # check if current day is a weekday or wkend
+    day_type = 0
+    if curr_dt.weekday() >= 5:
+        day_type = 1
+
+    # get the hour from current_datetime
+    hour = curr_dt.hour
+
+    return network[current_node][k][day_type][hour]
+
+
+# returns estimated time, in minutes.
 def t3():
     # keys = node ids, values = index in adj matrix
     ind_node_dict = dict()
@@ -198,11 +230,11 @@ def t3():
     # get output of t2 (the match tuple? i'm assuming we're
     # returning that from t2 but idk)
     match = t2()
-    print(match)
+    # print(match)
 
     # we just need the chosen driver from t2()
     driver_coords = (match[0][1][1], match[0][1][2])
-    print(driver_coords)
+    # print(driver_coords)
 
     passenger_coords = (match[1][1][3], match[1][1][4])
 
@@ -212,33 +244,33 @@ def t3():
     for node in nodetuples:
         nodes_dict[(node[1], node[2])] = node[0]
         nodes_arr.append((node[1], node[2]))
-
     closest_vertex_to_driver = findClosestNode(driver_coords, nodes_arr)
-    s = nodes_dict.get(
-        closest_vertex_to_driver
-    )  # get node id of node to start traversal on
-    s_ind = ind_node_dict.get(
-        nodes_dict.get(closest_vertex_to_driver)
-    )  # get index of that node in adj matrix
-
     closest_vertex_to_pass = findClosestNode(passenger_coords, nodes_arr)
-    t = nodes_dict.get(
-        closest_vertex_to_pass
-    )  # get node id of node to finish traversal on
-    t_ind = ind_node_dict.get(
-        nodes_dict.get(closest_vertex_to_pass)
-    )  # get index of that node in adj matrix
 
-    # Get total number of nodes in the graph
+    # get node id of node to start traversal on
+    s = nodes_dict.get(closest_vertex_to_driver)
+
+    # get index of that node in adj matrix
+    s_ind = ind_node_dict.get(nodes_dict.get(closest_vertex_to_driver))
+
+    # get node id of node to finish traversal on
+    t = nodes_dict.get(closest_vertex_to_pass)
+
+    # get index of that node in adj matrix
+    t_ind = ind_node_dict.get(nodes_dict.get(closest_vertex_to_pass))
+
     num_nodes = i + 1
 
     # Initialize distance and visited arrays
     distances = [float("inf")] * num_nodes
     visited = []
+    estimated_time = sum(distances)
 
     # Set distance at starting node to 0 and add to visited list
     # serves as our priority queue
     distances[s_ind] = 0
+
+    curr_dt = datetime.strptime(match[0][1][0], "%m/%d/%Y %H:%M:%S")
 
     # Loop through all nodes to find shortest path to each node
     for j in range(num_nodes):
@@ -248,24 +280,25 @@ def t3():
         # Add current_node to list of visited nodes
         visited.append(current_node)
 
-        # Loop through all neighboring nodes of current_node
+        # Loop through all neighbors of current_node
         for k in range(num_nodes):
             # Check if there is an edge from current_node to neighbor
-            if network.graph[current_node][k] != None:
+            if network.graph[current_node][k] != 0:
+                # get the correct edge weight for this edge
+                weight = getCorrectWeight(curr_dt, network, current_node, k)
                 # Calculate the distance from start_node to neighbor,
                 # passing through current_node
-                # need to look at driver time
-                new_distance = distances[current_node] + network[current_node][k]
+                new_distance = distances[current_node] + weight
 
                 # Update the distance if it is less than previous recorded value
                 if new_distance < distances[k]:
                     distances[k] = new_distance
+                    # since we updated distances, we need to update
+                    clock(curr_dt, estimated_time)
+    return estimated_time
 
-    # Return the list of the shortest distances to all nodes
-    return distances
 
-
-# First, let's define a function to find the node with the smallest distance
+# finds node with the smallest distance
 # that has not been visited yet
 def minDistance(distances, visited):
     # Initialize minimum distance for next node
@@ -280,6 +313,13 @@ def minDistance(distances, visited):
 
     return min_index
 
+
+# def convertTwelveHr(military_time):
+#    # Parse the military time string into a datetime object
+#    just_time = military_time.split()
+#    dt = datetime.strptime(just_time, '%H:%M:%S')
+#    # Format the datetime object into a regular time string
+#    return dt.strftime('%I:%M:%S %p')
 
 # def t3():
 #     dpTravelTimes = defaultdict(list)
@@ -333,7 +373,9 @@ def main():
     # print(findClosestNode(driver_coords, nodes_arr))
     # print(edgetuples)
     # print(len(edgetuples[0]))
-    t3()
+    n = 0.0138432
+    print(convertHours(n))
+    # t3()
 
 
 if __name__ == "__main__":
