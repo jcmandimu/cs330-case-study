@@ -124,13 +124,22 @@ def t2():
         # print(next_passenger)
         # print(driver_to_match)
         # print(match)
-    return
+    return match
 
 
+# returns w_list with two nested arrays: 1st one
+# is a list of estimated time to travel on a certain road/edge
+# on a certain weekday and hour.
+# 2nd nested array is same idea but on a certain weekend.
 def buildEdgeWeights(t):
     w_list = []
     wkday_avg_times = []
     wkend_avg_times = []
+
+    # print(t)
+    # print("t[3] aka each wkday speed: ", str(t[3]))
+    # print("length of wkday speed tuple in t: ", str(len(t[3])))
+
     for wkday_speed in t[3]:
         wkday_avg_times.append(
             t[2] / wkday_speed
@@ -143,72 +152,133 @@ def buildEdgeWeights(t):
 
     w_list.append(wkday_avg_times)
     w_list.append(wkend_avg_times)
-    return w_list
+    return w_list  # 1st element: wkday_avg_times, 2nd element: wkend_avg_times
 
 
-def buildGraph(edgetuples):  # will have to run this several times
-    newset = set()
-    for t in edgetuples:
-        newset.add(t[0])  # 0th element of each tuple is one vertex of tht edge
-        newset.add(t[1])  # 1st element of each tuple is other vertex of tht edge
+def buildGraph(i, edgetuples, ind_node_dict):
+    # newset = set()
+    # for t in edgetuples:
+    #     newset.add(t[0])
+    #     newset.add(t[1])
 
-    network = Graph(max(newset))
+    # scrapping the code above because it makes the matrix way too big.
+    # memory cant handle it!!!
+
+    network = Graph(i)  # graph represented by i x i matrix
 
     for t in edgetuples:
         w_list = buildEdgeWeights(t)
-
-    network.addEdgeToAdjMatrix(t[0], t[1], w_list)
+        network.addEdgeToAdjMatrix(
+            ind_node_dict.get(t[0]), ind_node_dict.get(t[1]), w_list
+        )
     return network
 
 
-# returns s: starting vertex for t3()/Dijkstra's
 def findClosestNode(driver_coords, nodes_arr):
-    # Base case: if the list is empty, return None
-    if not nodes_arr:
-        return None
-
-    if len(nodes_arr) == 1:
-        return nodes_arr[0]
-
-    # Divide the list into two halves
-    mid = len(nodes_arr) // 2
-    left = nodes_arr[:mid]
-    right = nodes_arr[mid:]
-
-    # Recursively find the closest coordinate in the left and right halves
-    closest_left = findClosestNode(driver_coords, left)
-    closest_right = findClosestNode(driver_coords, right)
-
-    # If the closest coordinate is in the left half, return it
-    if not closest_right or math.dist(closest_left, driver_coords) < math.dist(
-        closest_right, driver_coords
-    ):
-        return closest_left
-
-    # If the closest coordinate is in the right half, return it
-    return closest_right
+    min = float("inf")
+    ret = [nodes_arr[0]]
+    for n in nodes_arr:
+        if math.dist(n, driver_coords) < min:
+            min = math.dist(n, driver_coords)
+            ret[0] = n
+    return ret[0]
 
 
-def t3(nodetuples, edgetuples):
-    # we want all the vertices
-    network = buildGraph(edgetuples)
+# time is in hours.
+def t3():
+    # keys = node ids, values = index in adj matrix
+    ind_node_dict = dict()
+    i = 0
+    for nt in nodetuples:
+        ind_node_dict[int(nt[0])] = i
+        i += 1
+
+    network = buildGraph(i, edgetuples, ind_node_dict)
 
     # get output of t2 (the match tuple? i'm assuming we're
     # returning that from t2 but idk)
     match = t2()
+    print(match)
 
     # we just need the chosen driver from t2()
     driver_coords = (match[0][1][1], match[0][1][2])
+    print(driver_coords)
+
+    passenger_coords = (match[1][1][3], match[1][1][4])
 
     # key = node's coordinate; value = node id
     nodes_dict = dict()
     nodes_arr = []
     for node in nodetuples:
-        nodes_dict[(node[2], node[1])] = node[0]
-        nodes_arr.append((node[2], node[1]))
+        nodes_dict[(node[1], node[2])] = node[0]
+        nodes_arr.append((node[1], node[2]))
 
-    closest_vertex = findClosestNode(driver_coords, nodes_arr)
-    s = nodes_dict.get(closest_vertex)
+    closest_vertex_to_driver = findClosestNode(driver_coords, nodes_arr)
+    s = nodes_dict.get(
+        closest_vertex_to_driver
+    )  # get node id of node to start traversal on
+    s_ind = ind_node_dict.get(
+        nodes_dict.get(closest_vertex_to_driver)
+    )  # get index of that node in adj matrix
+
+    closest_vertex_to_pass = findClosestNode(passenger_coords, nodes_arr)
+    t = nodes_dict.get(
+        closest_vertex_to_pass
+    )  # get node id of node to finish traversal on
+    t_ind = ind_node_dict.get(
+        nodes_dict.get(closest_vertex_to_pass)
+    )  # get index of that node in adj matrix
+
+    # Get total number of nodes in the graph
+    num_nodes = i + 1
+
+    # Initialize distance and visited arrays
+    distances = [float("inf")] * num_nodes
+    visited = []
+
+    # Set distance at starting node to 0 and add to visited list
+    # serves as our priority queue
+    distances[s_ind] = 0
+
+    # Loop through all nodes to find shortest path to each node
+    for j in range(num_nodes):
+        # Find minimum distance node that has not been visited yet
+        current_node = minDistance(distances, visited)
+
+        # Add current_node to list of visited nodes
+        visited.append(current_node)
+
+        # Loop through all neighboring nodes of current_node
+        for k in range(num_nodes):
+            # Check if there is an edge from current_node to neighbor
+            if network.graph[current_node][k] != None:
+                # Calculate the distance from start_node to neighbor,
+                # passing through current_node
+                # need to look at driver time
+                new_distance = distances[current_node] + network[current_node][k]
+
+                # Update the distance if it is less than previous recorded value
+                if new_distance < distances[k]:
+                    distances[k] = new_distance
+
+    # Return the list of the shortest distances to all nodes
+    return distances
+
+
+# First, let's define a function to find the node with the smallest distance
+# that has not been visited yet
+def minDistance(distances, visited):
+    # Initialize minimum distance for next node
+    min_val = float("inf")
+    min_index = -1
+
+    # Loop through all nodes to find minimum distance
+    for i in range(len(distances)):
+        if distances[i] < min_val and i not in visited:
+            min_val = distances[i]
+            min_index = i
+
+    return min_index
 
 
 # def t3():
@@ -257,11 +327,13 @@ def t3(nodetuples, edgetuples):
 
 
 def main():
-    # p = (9, 3)
-    # d = [(1, 0), (9, 4), (4, 2)]
-    # print(closestDriver(p, d))
-    print(t2())
-    # buildGraph(edgetuples)
+    # driver_coords = (9, 3)
+    # nodes_arr = [(9,3), (9, 3.5), (4, 2)]
+    # print("closest Coordinaates: ")
+    # print(findClosestNode(driver_coords, nodes_arr))
+    # print(edgetuples)
+    # print(len(edgetuples[0]))
+    t3()
 
 
 if __name__ == "__main__":

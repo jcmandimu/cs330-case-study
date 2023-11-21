@@ -11,10 +11,8 @@ driversdata = pd.read_csv("drivers.csv")
 passengersdata = pd.read_csv("passengers.csv")
 edge_data = pd.read_csv("edges.csv")
 
-# Opening JSON file
-n = open("node_data.json")
 
-# returns JSON object as a dictionary
+n = open("node_data.json")
 node_data = js.load(n)
 
 
@@ -223,7 +221,7 @@ def main():
     # returns JSON object as a dictionary
     node_data = js.load(n)
     getNodeInfo(node_data)
-    getEdgeInfo(edge_data)
+
 
 
 if __name__ == "__main__":
