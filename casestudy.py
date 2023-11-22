@@ -142,13 +142,13 @@ def buildEdgeWeights(t):
 
     for wkday_speed in t[3]:
         wkday_avg_times.append(
-            t[2] / wkday_speed
-        )  # length of road/avg speed on that given hour
+            60*(t[2] / wkday_speed)
+        )  # length of road/avg speed on that given hour. converted to minutes
 
     for wkend_speed in t[4]:
         wkend_avg_times.append(
-            t[2] / wkend_speed
-        )  # length of road/avg speed on that given hour
+            60*(t[2] / wkend_speed)
+        )  # length of road/avg speed on that given hour. converted to minutes
 
     w_list.append(wkday_avg_times)
     w_list.append(wkend_avg_times)
@@ -229,7 +229,7 @@ def t3():
 
     # get output of t2 (the match tuple? i'm assuming we're
     # returning that from t2 but idk)
-    match = t2()
+    match = t2()[0]
     # print(match)
 
     # we just need the chosen driver from t2()
@@ -262,20 +262,20 @@ def t3():
     num_nodes = i + 1
 
     # Initialize distance and visited arrays
-    distances = [float("inf")] * num_nodes
+    times = [float("inf")] * num_nodes
     visited = []
-    estimated_time = sum(distances)
+    estimated_time = 0
 
     # Set distance at starting node to 0 and add to visited list
     # serves as our priority queue
-    distances[s_ind] = 0
+    times[s_ind] = 0
 
     curr_dt = datetime.strptime(match[0][1][0], "%m/%d/%Y %H:%M:%S")
 
     # Loop through all nodes to find shortest path to each node
     for j in range(num_nodes):
         # Find minimum distance node that has not been visited yet
-        current_node = minDistance(distances, visited)
+        current_node = minDistance(times, visited)
 
         # Add current_node to list of visited nodes
         visited.append(current_node)
@@ -286,15 +286,22 @@ def t3():
             if network.graph[current_node][k] != 0:
                 # get the correct edge weight for this edge
                 weight = getCorrectWeight(curr_dt, network, current_node, k)
+
                 # Calculate the distance from start_node to neighbor,
                 # passing through current_node
-                new_distance = distances[current_node] + weight
+                new_time = times[current_node] + weight
 
                 # Update the distance if it is less than previous recorded value
-                if new_distance < distances[k]:
-                    distances[k] = new_distance
-                    # since we updated distances, we need to update
+                if new_time < times[k]:
+                    times[k] = new_time
+                    # since we updated times, we need to update the current date and time
                     clock(curr_dt, estimated_time)
+
+                estimated_time += new_time
+                clock(curr_dt, estimated_time)
+            # if the node current_node is adj to is the passenger's destination
+            if k == t_ind:
+                return estimated_time
     return estimated_time
 
 # def t4():
@@ -480,7 +487,7 @@ def main():
     # n = 0.0138432
     # print(convertHours(n))
     # t3()
-    #t5()
+    t5()
 
 
 if __name__ == "__main__":
