@@ -223,6 +223,19 @@ def main():
     driversdata = pd.read_csv("drivers.csv", nrows = 1)
     print(createdriverstuple(driversdata))
 
+#t4 functions
+def astar(graph,start,end):
+    return
+
+#t5 functions
+def calculatingDestDistances(dists):
+    for driver in driverstuples:
+        for passenger in passengerstuples:
+            distance = calculateDistance(
+                driver[1][1], passenger[1][3], driver[1][2], passenger[1][4]
+            )
+            dists[passenger].append((driver, distance))
+
 
 
 if __name__ == "__main__":

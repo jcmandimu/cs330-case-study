@@ -297,6 +297,56 @@ def t3():
                     clock(curr_dt, estimated_time)
     return estimated_time
 
+# def t4():
+    
+#     # Create the same road graph as was used for T3
+#     ind_node_dict = dict()
+#     i = 0
+#     for nt in nodetuples:
+#         ind_node_dict[int(nt[0])] = i
+#         i += 1
+
+#     network = buildGraph(i, edgetuples, ind_node_dict)
+
+#     # get output of t2 (the match tuple? i'm assuming we're
+#     # returning that from t2 but idk)
+#     match = t2()
+#     # print(match)
+
+#     # we just need the chosen driver from t2()
+#     driver_coords = (match[0][1][1], match[0][1][2])
+#     # print(driver_coords)
+
+#     passenger_coords = (match[1][1][3], match[1][1][4])
+
+#     # key = node's coordinate; value = node id
+#     nodes_dict = dict()
+#     nodes_arr = []
+#     for node in nodetuples:
+#         nodes_dict[(node[1], node[2])] = node[0]
+#         nodes_arr.append((node[1], node[2]))
+#     closest_vertex_to_driver = findClosestNode(driver_coords, nodes_arr)
+#     closest_vertex_to_pass = findClosestNode(passenger_coords, nodes_arr)
+
+#     # get node id of node to start traversal on
+#     s = nodes_dict.get(closest_vertex_to_driver)
+
+#     # get index of that node in adj matrix
+#     s_ind = ind_node_dict.get(nodes_dict.get(closest_vertex_to_driver))
+
+#     # get node id of node to finish traversal on
+#     t = nodes_dict.get(closest_vertex_to_pass)
+
+#     # get index of that node in adj matrix
+#     t_ind = ind_node_dict.get(nodes_dict.get(closest_vertex_to_pass))
+
+#     astar(network,start_ind,t_ind)
+
+#     return
+
+
+
+    
 
 # finds node with the smallest distance
 # that has not been visited yet
@@ -312,6 +362,60 @@ def minDistance(distances, visited):
             min_index = i
 
     return min_index
+
+def t5():
+    start=time.time()
+
+    driverstuples = createdriverstuple(driversdata)
+    passengerstuples = createpassengerstuple(passengersdata)
+
+    # dictionary with driver-passanger pairs as keys and distances as values
+    dpDistances = defaultdict(list)
+    calculatingDestDistances(dpDistances)
+
+    # print(dpDistances.get(passengerstuples[1]))
+
+    heapq._heapify_max(passengerstuples)
+
+    # initializing FIFO queue for drivers
+    dq = deque()
+    for d in driverstuples:
+        # put each driver in the queue
+        dq.append(d)
+
+    # Create match
+    for passenger in passengerstuples:
+        if not passengerstuples:
+            return
+        if not dq:
+            return
+
+        next_passenger = heapq._heappop_max(passengerstuples)
+
+        driver_to_match = max(dpDistances.get(next_passenger), key=lambda x: x[1])
+        driver_to_match = driver_to_match[0]
+
+        # if this is the closet match
+        if dq[0] == driver_to_match:
+            # pop out the firt elem aka first driver
+            dq.popleft()
+            # and put it back into the back of the queue
+            # dq.push(driver_to_match)
+        else:
+            # Find new match
+            if driver_to_match not in dq:
+                driver_to_match = dq.popleft()
+            else:
+                dq.remove(driver_to_match)
+
+        # driver_to_match
+        match = (driver_to_match, next_passenger)
+        print(match)
+
+        # print(next_passenger)
+        # print(driver_to_match)
+        # print(match)
+    return match
 
 
 # def convertTwelveHr(military_time):
@@ -373,9 +477,10 @@ def main():
     # print(findClosestNode(driver_coords, nodes_arr))
     # print(edgetuples)
     # print(len(edgetuples[0]))
-    n = 0.0138432
-    print(convertHours(n))
+    # n = 0.0138432
+    # print(convertHours(n))
     # t3()
+    #t5()
 
 
 if __name__ == "__main__":
